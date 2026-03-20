@@ -61,11 +61,18 @@ Response:
 
 The first deploy takes ~5 minutes (model download is cached in the Docker image).
 
+### Troubleshooting: 500 Internal Server Error
+
+- **TLS to Postgres** — Managed DBs often require SSL. If `DATABASE_URL` does not include `sslmode=require`, add a Railway variable **`DATABASE_SSL=true`** so the app uses TLS (asyncpg does not always honor `sslmode` in the URL alone).
+- **pgvector** — The app runs `CREATE EXTENSION vector` on startup; the DB user must be allowed to create it, or run `CREATE EXTENSION vector` once in the DB console (see above).
+- **Check logs** — Open the Railway (or host) deploy logs and look for `Database initialization failed` or stack traces from SQLAlchemy/asyncpg.
+
 ### Environment Variables
 
 | Variable              | Default       | Description                       |
 |-----------------------|---------------|-----------------------------------|
 | `DATABASE_URL`        | *(required)*  | PostgreSQL connection string      |
+| `DATABASE_SSL`        | *(auto)*      | Set `true` if managed Postgres requires TLS and you still get connection errors / 500s (see below) |
 | `CLIP_MODEL`          | `ViT-L-14`   | CLIP model variant                |
 | `CLIP_PRETRAINED`     | `openai`      | Pretrained weights                |
 | `DUPLICATE_THRESHOLD` | `0.92`        | Similarity threshold for dedup    |

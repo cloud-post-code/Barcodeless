@@ -4,6 +4,8 @@ from pydantic import field_validator
 
 class Settings(BaseSettings):
     database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/barcodeless"
+    # None = infer from DATABASE_URL sslmode= / PGSSLMODE, or set True for Railway if URL has no sslmode
+    database_ssl: bool | None = None
     clip_model: str = "ViT-L-14"
     clip_pretrained: str = "openai"
     embedding_dim: int = 768
