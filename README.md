@@ -61,9 +61,13 @@ Response:
 
 The first deploy takes ~5 minutes (model download is cached in the Docker image).
 
+### Browser console: `mce-autosize-textarea` / `webcomponents-ce.js`
+
+That error is **not from Barcodeless**. It comes from a **browser extension** or **embedded overlay** (e.g. Grammarly-style tools, password managers) that registers the same custom element twice. Use **Incognito/private** with extensions disabled, or another browser, to confirm. It does not cause the `/items` **500**.
+
 ### Troubleshooting: 500 Internal Server Error
 
-- **TLS to Postgres** — Managed DBs often require SSL. If `DATABASE_URL` does not include `sslmode=require`, add a Railway variable **`DATABASE_SSL=true`** so the app uses TLS (asyncpg does not always honor `sslmode` in the URL alone).
+- **TLS to Postgres** — Managed DBs often require SSL. The app now enables TLS automatically for common hosts (e.g. Railway `*.rlwy.net`). You can still set **`DATABASE_SSL=true`** if your host is different. If `DATABASE_URL` includes `sslmode=require`, that is honored as well.
 - **pgvector** — The app runs `CREATE EXTENSION vector` on startup; the DB user must be allowed to create it, or run `CREATE EXTENSION vector` once in the DB console (see above).
 - **Check logs** — Open the Railway (or host) deploy logs and look for `Database initialization failed` or stack traces from SQLAlchemy/asyncpg.
 

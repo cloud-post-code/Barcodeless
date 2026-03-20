@@ -11,6 +11,24 @@ from app.config import settings
 
 logger = logging.getLogger(__name__)
 
+# Host substrings that almost always mean "public managed Postgres → TLS required"
+_MANAGED_PG_SSL_HOST_HINTS = (
+    "rlwy.net",  # Railway Postgres proxy (*.proxy.rlwy.net)
+    "railway.app",
+    "neon.tech",
+    "supabase.co",
+    "render.com",
+)
+
+
+def _host_suggests_managed_ssl(host: str | None) -> bool:
+    if not host:
+        return False
+    h = host.lower()
+    if h in ("localhost", "127.0.0.1", "::1"):
+        return False
+    return any(marker in h for marker in _MANAGED_PG_SSL_HOST_HINTS)
+
 
 def _prepare_async_engine():
     """Build engine URL + asyncpg connect_args.
@@ -47,6 +65,10 @@ def _prepare_async_engine():
         use_ssl = True
     elif q.get("ssl") in ("true", "1", "True"):
         use_ssl = True
+    elif _host_suggests_managed_ssl(url.host):
+        # Railway often omits sslmode in DATABASE_URL; asyncpg still needs ssl= in connect_args
+        use_ssl = True
+        logger.info("Postgres host %s looks like a managed provider — enabling TLS", url.host)
 
     if use_ssl:
         connect_args["ssl"] = ssl.create_default_context()
