@@ -23,6 +23,7 @@ def _item_to_response(item: Item) -> ItemResponse:
         name=item.name,
         description=item.description,
         metadata=item.metadata_ or {},
+        image_ids=[str(img.id) for img in item.images] if item.images else [],
         image_count=len(item.images) if item.images else 0,
         embedding_count=len(item.embeddings) if item.embeddings else 0,
         created_at=item.created_at,

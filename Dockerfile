@@ -1,3 +1,10 @@
+FROM node:20-slim AS frontend-build
+WORKDIR /frontend
+COPY frontend/package.json frontend/package-lock.json* ./
+RUN npm install
+COPY frontend/ .
+RUN npm run build
+
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -19,6 +26,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN python -c "import open_clip; open_clip.create_model_and_transforms('ViT-L-14', pretrained='openai')"
 
 COPY . .
+
+COPY --from=frontend-build /frontend/dist ./frontend/dist
 
 EXPOSE 8000
 

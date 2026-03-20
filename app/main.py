@@ -1,9 +1,11 @@
 import asyncio
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.database import init_db
 from app.routers import items, scan
@@ -68,3 +70,7 @@ async def health():
         status="healthy" if embedding_service.is_ready else "loading",
         model_loaded=embedding_service.is_ready,
     )
+
+_frontend_dir = Path(__file__).resolve().parent.parent / "frontend" / "dist"
+if _frontend_dir.is_dir():
+    app.mount("/", StaticFiles(directory=_frontend_dir, html=True), name="frontend")

@@ -14,6 +14,7 @@ class ItemResponse(BaseModel):
     name: str
     description: str | None = None
     metadata: dict = {}
+    image_ids: list[str] = []
     image_count: int = 0
     embedding_count: int = 0
     created_at: datetime | None = None
