@@ -5,6 +5,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.database import init_db
@@ -72,6 +73,22 @@ async def health():
         model_loaded=embedding_service.is_ready,
     )
 
+# Vite build: /assets/* hashed files; client routes (/register, /items/:id) need index.html.
+# Do NOT mount the whole dist at "/" — StaticFiles(html=True) does not SPA-fallback for
+# unknown paths, so GET /register would 404. Serve assets from /assets and fall back to
+# index.html for other GETs (registered after API routes so /items, /health win first).
 _frontend_dir = Path(__file__).resolve().parent.parent / "frontend" / "dist"
-if _frontend_dir.is_dir():
-    app.mount("/", StaticFiles(directory=_frontend_dir, html=True), name="frontend")
+_assets_dir = _frontend_dir / "assets"
+_index_html = _frontend_dir / "index.html"
+
+if _index_html.is_file():
+    if _assets_dir.is_dir():
+        app.mount("/assets", StaticFiles(directory=_assets_dir), name="frontend-assets")
+
+    @app.get("/")
+    async def spa_index():
+        return FileResponse(_index_html)
+
+    @app.get("/{full_path:path}")
+    async def spa_fallback(full_path: str):  # noqa: ARG001
+        return FileResponse(_index_html)
