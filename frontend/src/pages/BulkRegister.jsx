@@ -2,6 +2,13 @@ import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { createItem } from "../api";
 
+const IMAGE_EXT = /\.(jpe?g|png|gif|webp|bmp|tiff?|heic|heif)$/i;
+
+function isLikelyImageFile(file) {
+  if (file.type && file.type.startsWith("image/")) return true;
+  return IMAGE_EXT.test(file.name);
+}
+
 function basenameNoExt(filename) {
   const base = filename.replace(/^.*[/\\]/, "");
   return base.replace(/\.[^.]+$/, "") || base || "Untitled";
@@ -30,7 +37,7 @@ export default function BulkRegister() {
   const canStart = totalRows > 0 && !processing;
 
   const addFiles = useCallback((fileList) => {
-    const files = Array.from(fileList || []).filter((f) => f.type.startsWith("image/"));
+    const files = Array.from(fileList || []).filter(isLikelyImageFile);
     if (files.length === 0) return;
     setRows((prev) => [...prev, ...files.map(makeRow)]);
   }, []);
@@ -126,19 +133,19 @@ export default function BulkRegister() {
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-          Bulk register
+          Register items
         </h1>
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          Add many images at once. Each row is registered as one item. Names default to the
-          file name; edit before starting. Items are sent one at a time so the server can
+          Add one or many images. Each image becomes one catalog item. Names default to the
+          file name — edit before starting. Items are sent one at a time so the server can
           process embeddings safely.
         </p>
         <p className="mt-2 text-sm">
           <Link
-            to="/register"
+            to="/catalog"
             className="text-indigo-600 dark:text-indigo-400 hover:underline"
           >
-            Single item registration
+            View catalog
           </Link>
         </p>
       </div>
