@@ -45,8 +45,11 @@ export default function Navbar() {
             <NavLink to="/catalog" className={linkClass}>
               Catalog
             </NavLink>
-            <NavLink to="/register" className={linkClass}>
+            <NavLink to="/register" className={linkClass} end>
               Register
+            </NavLink>
+            <NavLink to="/register/bulk" className={linkClass}>
+              Bulk
             </NavLink>
           </div>
           <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">

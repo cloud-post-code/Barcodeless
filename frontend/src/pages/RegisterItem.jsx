@@ -46,6 +46,14 @@ export default function RegisterItem() {
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
           Add a new product to the catalog with a reference image.
         </p>
+        <p className="mt-2 text-sm">
+          <Link
+            to="/register/bulk"
+            className="text-indigo-600 dark:text-indigo-400 hover:underline"
+          >
+            Register many items at once with a progress bar
+          </Link>
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
