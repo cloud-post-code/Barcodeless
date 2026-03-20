@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     duplicate_threshold: float = 0.92
     top_k_recall: int = 50
     port: int = 8000
+    # Set True on Railway temporarily to return exception text in JSON (debug only).
+    expose_internal_errors: bool = False
 
     @field_validator("database_url")
     @classmethod

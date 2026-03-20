@@ -77,6 +77,7 @@ That error is **not from Barcodeless**. It comes from a **browser extension** or
 |-----------------------|---------------|-----------------------------------|
 | `DATABASE_URL`        | *(required)*  | PostgreSQL connection string      |
 | `DATABASE_SSL`        | *(auto)*      | Set `true` if managed Postgres requires TLS and you still get connection errors / 500s (see below) |
+| `EXPOSE_INTERNAL_ERRORS` | `false`   | Set `true` **temporarily** so API error JSON includes the real exception message (debug only; remove after fixing) |
 | `CLIP_MODEL`          | `ViT-L-14`   | CLIP model variant                |
 | `CLIP_PRETRAINED`     | `openai`      | Pretrained weights                |
 | `DUPLICATE_THRESHOLD` | `0.92`        | Similarity threshold for dedup    |
