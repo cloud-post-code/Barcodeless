@@ -65,11 +65,17 @@ The first deploy takes ~5 minutes (model download is cached in the Docker image)
 
 That error is **not from Barcodeless**. It comes from a **browser extension** or **embedded overlay** (e.g. Grammarly-style tools, password managers) that registers the same custom element twice. Use **Incognito/private** with extensions disabled, or another browser, to confirm. It does not cause the `/items` **500**.
 
+### Troubleshooting: database / 503 “CREATE EXTENSION vector…”
+
+1. **Link Postgres to the app** — In Railway, open your **web service → Variables** and ensure `DATABASE_URL` is set (often via **Reference Variable** from the Postgres plugin). Redeploy after fixing.
+2. **TLS** — Deploy logs show a line like `Postgres: host=… tls=on|off`. If connections fail against a **public** DB hostname, set **`DATABASE_SSL=true`**. Private URLs (`*.railway.internal`, single-name hosts like `postgres`) stay off TLS automatically.
+3. **pgvector** — Use a Postgres that ships pgvector (Railway’s template does). The app runs `CREATE EXTENSION IF NOT EXISTS vector` on startup; if that fails, run **`CREATE EXTENSION vector`** once in the Postgres **Query** / console as a superuser.
+4. **Debug detail** — Set **`EXPOSE_INTERNAL_ERRORS=true`** temporarily to see the raw DB error in API JSON (turn it off afterward).
+
 ### Troubleshooting: 500 Internal Server Error
 
-- **TLS to Postgres** — Managed DBs often require SSL. The app now enables TLS automatically for common hosts (e.g. Railway `*.rlwy.net`). You can still set **`DATABASE_SSL=true`** if your host is different. If `DATABASE_URL` includes `sslmode=require`, that is honored as well.
-- **pgvector** — The app runs `CREATE EXTENSION vector` on startup; the DB user must be allowed to create it, or run `CREATE EXTENSION vector` once in the DB console (see above).
-- **Check logs** — Open the Railway (or host) deploy logs and look for `Database initialization failed` or stack traces from SQLAlchemy/asyncpg.
+- **TLS to Postgres** — Same as above: check `tls=on/off` in logs and **`DATABASE_SSL=true`** if needed.
+- **Check logs** — Look for `Database initialization failed` or SQLAlchemy/asyncpg tracebacks on deploy or first request.
 
 ### Environment Variables
 

@@ -42,8 +42,8 @@ def _raise_from_image_error(exc: BaseException) -> None:
 def _raise_from_db_error(exc: BaseException, where: str) -> None:
     logger.exception("Database error in %s", where)
     base = (
-        "Database error. Ensure PostgreSQL has CREATE EXTENSION vector, DATABASE_URL is "
-        "correct, and TLS is enabled for managed hosts (see README)."
+        "Database error. Check DATABASE_URL (Railway: reference Postgres plugin), pgvector "
+        "(CREATE EXTENSION vector), and TLS (set DATABASE_SSL=true if required; see README)."
     )
     if extra := _expose_exc(exc):
         base = f"{base} Details: {extra}"
